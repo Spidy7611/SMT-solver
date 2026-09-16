@@ -6,7 +6,7 @@
 class CDCLFormula : public WatchedFormula {
 public:
     int numVars;
-    //TODO: A klózokat tömbként is lehetne kezelni!
+    // A klózokat más adatszerkeuzetként lehetne kezelni?
     //talán ha  atanult klózok külön helyen lennének h a halmaz is tömb lehessen gyorsabb lenne?
     std::vector<std::vector<int>> clauses;
     std::vector<int> assignments; // 0, 1, -1
