@@ -26,7 +26,7 @@ public:
     std::vector<double> activity;
 
     // 4. Trail limit: Hol kezdődnek az egyes döntési szintek a trail-en?
-    // controllstack helyett
+   
     std::vector<int> trailLim;
 
     int qhead = 0;
