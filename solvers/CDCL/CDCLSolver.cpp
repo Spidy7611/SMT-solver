@@ -167,7 +167,7 @@ void CDCLSolver::analyzeConflict(CDCLFormula& f, int conflictClauseID, std::vect
         }
         
         p = f.trail[index];
-        clauseID = f.reasons[std::abs(p)];
+        clauseID = f.reasons[std::abs(p)];//nem lehet -1
         seen[std::abs(p)] = false;
         pathC--;
         index--;
