@@ -47,14 +47,5 @@ Formula parseCNF(const std::string& filename) {
 
     formula.numVars = maxVar;
 
-    // Debug print
-   /* std::cout << "Parsed " << formula.numVars << " vars, "
-              << formula.clauses.size() << " clauses:\n";
-    for (size_t i = 0; i < formula.clauses.size(); ++i) {
-        std::cout << "Clause " << i+1 << ": ";
-        for (Literal lit : formula.clauses[i]) std::cout << lit << " ";
-        std::cout << "\n";
-    }*/
-
     return formula;
 }
