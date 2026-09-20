@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../types/Solver.h" 
+#include "../../types/Solver.h" 
 #include "../../formula/CDCLFormula.h"
 #include <vector>
 
