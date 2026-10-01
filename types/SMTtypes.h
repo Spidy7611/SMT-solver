@@ -65,7 +65,7 @@ void setValue(size_t val) {
     }
 }
 
-// Olvasás referencián keresztül:
+// Olvasás 
 uint64_t getValue() const {
     if (length_in_bits <= 8)  return pool.getAccess<uint8_t>(indx);
     if (length_in_bits <= 16) return pool.getAccess<uint16_t>(indx);
