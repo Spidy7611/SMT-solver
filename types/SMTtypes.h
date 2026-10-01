@@ -4,7 +4,7 @@
 #include <iostream>
 #include "../memory/MemoryPool.h"
    
-   //symbol_table["func_name"] = body_term_id; ilyesmi function to term mapping
+   //unordered map ami opkindra vagy termre fordít
     //OPok enumba
     /*enum class OpKind { 
     VAR,    
