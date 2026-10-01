@@ -7,7 +7,7 @@ class MemoryPool
 {
 
     std::vector<uint8_t *> chunks;
-    // 64Kb L1/l2 cache barát
+    // 64Kb 
     static constexpr size_t CHUNK_SIZE = 65536;
     size_t currentSize = 0;
 
