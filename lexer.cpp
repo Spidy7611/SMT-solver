@@ -7,12 +7,9 @@
 enum class TokenType {
     Unknown,
     EndFocal,     // Fájl vége (EOF)
-    Identifier,   // pl. változónevek, kulcsszavak (pl. x, declare, assert)
-    Number,       // pl. 42, 123
-    String,       // "szöveg literál"
-    Plus,         // +
-    Minus,        // -
-    Assign,       // =
+    Identifier,   // pl. változónevek, kulcsszavak (pl. x, declare, assert) 
+    Value,       // start with #
+    op,    
     LeftParen,    // (
     RightParen    // )
 };
@@ -30,6 +27,7 @@ class Lexer {
     const char* ptr;
     const char* end;
 
+
 public:
     Lexer(const char* data, size_t size) : ptr(data), end(data + size) {}
 
@@ -44,26 +42,15 @@ public:
         char c = *ptr;
 
         // --- Egykarakteres tokenek (Operátorok, Zárójelek) ---
-        if (c == '(') { ptr++; return {TokenType::LeftParen, "("}; }
-        if (c == ')') { ptr++; return {TokenType::RightParen, ")"}; }
-        if (c == '+') { ptr++; return {TokenType::Plus, "+"}; }
-        if (c == '-') { ptr++; return {TokenType::Minus, "-"}; }
-        if (c == '=') { ptr++; return {TokenType::Assign, "="}; }
+        if (c == '(') { ptr++;if(countParen==0)wasNull=true;countParen++ return {TokenType::LeftParen, "("}; }
+        if (c == ')') { ptr++;countParen-- return {TokenType::RightParen, ")"}; }
 
-        // --- String literálok (idézőjelek között) ---
-        if (c == '"') {
-            return read_string();
-        }
+        //több karakteres
+        if(c=='#')read_it(TokenType::Value)
+        read_it(TokenType::Identifier)
 
-        // --- Számok (számjeggyel kezdődőek) ---
-        if (std::isdigit(static_cast<unsigned char>(c))) {
-            return read_number();
-        }
 
-        // --- Azonosítók / Kulcsszavak (betűvel vagy megengedett karakterrel kezdődőek) ---
-        if (std::isalpha(static_cast<unsigned char>(c)) || c == '_') {
-            return read_identifier();
-        }
+
 
         // Ha ismeretlen karakterbe ütközünk
         ptr++;
@@ -71,6 +58,7 @@ public:
     }
 
 private:
+
     // Whitespace-ek (szóköz, tab, új sor) és opcionális kommentek átugrása
     void skip_whitespace_and_comments() {
         while (ptr < end) {
@@ -78,51 +66,32 @@ private:
             if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
                 ptr++;
             } 
-            else if (c == ';') { // Példa kommentre (mint az SMT-LIB-ben vagy Assemblyben)
+            else if (c == ';') { // komment
                 while (ptr < end && *ptr != '\n') {
                     ptr++;
                 }
             } 
             else {
+                
                 break;
             }
         }
     }
 
-    Token read_identifier() {
+    Token read_it(TokenType t) {
         const char* start = ptr;
         while (ptr < end) {
             char c = *ptr;
-            // Itt adhatod meg, mi tartozhat bele egy azonosítóba (pl. betűk, számok, kötőjel, aláhúzás)
-            if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-') {
+            if (c != ' ' || c != '(' || c != '(') {
                 ptr++;
             } else {
+                ptr--;//hátha () van
                 break;
             }
         }
-        return {TokenType::Identifier, std::string_view(start, ptr - start)};
+        return {t, std::string_view(start, ptr - start)};
     }
 
-    Token read_number() {
-        const char* start = ptr;
-        while (ptr < end && std::isdigit(static_cast<unsigned char>(*ptr))) {
-            ptr++;
-        }
-        return {TokenType::Number, std::string_view(start, ptr - start)};
-    }
-
-    Token read_string() {
-        const char* start = ptr;
-        ptr++; // Átlépjük a nyitó idézőjelet
-        while (ptr < end && *ptr != '"') {
-            // Itt kezelhető az escape karakter (pl. \") ha szükséges
-            ptr++;
-        }
-        if (ptr < end) {
-            ptr++; // Átlépjük a záró idézőjelet is
-        }
-        return {TokenType::String, std::string_view(start, ptr - start)};
-    }
 };
 
 // --- Tesztelés / Használat ---
