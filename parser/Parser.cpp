@@ -49,9 +49,112 @@ Formula parseCNF(const std::string& filename) {
 
     return formula;
 }
+//SMT
+#include <iostream>
+#include <string_view>
+#include "../types/SMTtypes.h"
+
+
+class Lexer {
+    const char* ptr;
+    const char* end;
+
+
+public:
+    Lexer(const char* data, size_t size) : ptr(data), end(data + size) {}
+
+    Token next_token() {
+        skip_whitespace_and_comments();
+
+        // Ellenőrizzük, elértük-e a fájl végét
+        if (ptr >= end) {
+            return {TokenType::EndFocal, {}};
+        }
+
+        char c = *ptr;
+
+        // --- Egykarakteres tokenek (Operátorok, Zárójelek) ---
+        if (c == '(') { ptr++; return {TokenType::LeftParen, "("}; }
+        if (c == ')') { ptr++; return {TokenType::RightParen, ")"}; }
+
+        //több karakteres
+        if(c=='#')return read_it(TokenType::Value);
+        return read_it(TokenType::Identifier);
+
+
+
+
+        // Ha ismeretlen karakterbe ütközünk
+        ptr++;
+        return {TokenType::Unknown, std::string_view(ptr - 1, 1)};
+    }
+
+private:
+
+    // Whitespace-ek (szóköz, tab, új sor) és opcionális kommentek átugrása
+    void skip_whitespace_and_comments() {
+        while (ptr < end) {
+            char c = *ptr;
+            if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+                ptr++;
+            } 
+            else if (c == ';') { // komment
+                while (ptr < end && *ptr != '\n') {
+                    ptr++;
+                }
+            } 
+            else {
+                
+                break;
+            }
+        }
+    }
+
+Token read_it(TokenType t) {
+    const char* start = ptr;
+
+    while (ptr < end) {
+        char c = *ptr;
+
+        if (c == ' ' || c == '\t' || c == '\n' ||
+            c == '\r' || c == '(' || c == ')') {
+            break;
+        }
+
+        ptr++;
+    }
+
+    return {t, std::string_view(start, ptr - start)};
+}
+};
+
 
 int parseSMTLIB(const std::string& filename) {
 
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Nem sikerult megnyitni a fajlt");
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    std::string source_code = buffer.str();
+
+    Lexer lexer(source_code.data(), source_code.size());
+
+    Token token = lexer.next_token();
+
+    while (token.type != TokenType::EndFocal) {
+        std::cout << "Token: '" << token.text << "'\n";
+        token = lexer.next_token();
+    }
+
+    return 0;
+}
+  // --- Tesztelés / Használat ---
+int main() {
+    parseSMTLIB("or_monoton_n.txt");
 
 }
-  

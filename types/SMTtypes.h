@@ -1,34 +1,40 @@
 #include <variant>
 #include <vector>
+#include <optional>
 #include <cstdint>
 #include <iostream>
 #include "../memory/MemoryPool.h"
    
-   //unordered map ami opkindra vagy termre fordít
-    //OPok enumba
-    /*enum class OpKind { 
-    VAR,    
-    CONST,  
-    BV_ADD, 
-    BV_AND  
+
+
+//lexerhez
+enum class TokenType {
+    Unknown,
+    EndFocal,     // Fájl vége (EOF)
+    Identifier,   // pl. változónevek, kulcsszavak (pl. x, declare, assert) 
+    Value,       // start with #
+    op,    
+    LeftParen,    // (
+    RightParen    // )
 };
-pl
-*/
-/*
-vami struct ami op kindot és term idt tartalmaz
-*/
-//az összes term egy hatvány halmaz?
+struct Token {
+    TokenType type;
+    std::string_view text; // Mutató a pufferben lévő eredeti szövegrészletre (nincs másolás!)
+};
+
 enum class RelationKind {
     BV_ADD, 
     BV_AND 
 };
 
 
-std::vector<std::variant<BVLeaf, UnaryOp, BinaryOp>> AST;
+
 struct BVLeaf {
-    BitVector val;
+    //BitVector val;
     // Saját konstruktor
-    BVLeaf(BitVector v) : val(v) {} 
+    std::optional<int> val;
+    int size;
+    BVLeaf(int v,int s) : val(v) , size(s) {} 
 };
 
 struct UnaryOp {
@@ -44,7 +50,8 @@ struct BinaryOp {
     int child2;
     BinaryOp(int c1, int c2,RelationKind relation) : child1(c1), child2(c2),relation(relation) {}
 };
-
+std::vector<std::variant<BVLeaf, UnaryOp, BinaryOp>> AST;
+/*
 class BitVector {
     int length_in_bits;//bit-ben
     int indx;
@@ -72,4 +79,4 @@ uint64_t getValue() const {
     if (length_in_bits <= 32) return pool.getAccess<uint32_t>(indx);
     return pool.getAccess<uint64_t>(indx);
 }
-};
+};*/
