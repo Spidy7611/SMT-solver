@@ -3,7 +3,7 @@
 #include <optional>
 #include <cstdint>
 #include <iostream>
-#include "../memory/MemoryPool.h"
+//#include "../memory/MemoryPool.h"
    
 
 
@@ -50,6 +50,7 @@ struct BinaryOp {
     int child2;
     BinaryOp(int c1, int c2,RelationKind relation) : child1(c1), child2(c2),relation(relation) {}
 };
+
 std::vector<std::variant<BVLeaf, UnaryOp, BinaryOp>> AST;
 /*
 class BitVector {
