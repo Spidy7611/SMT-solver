@@ -147,6 +147,14 @@ int parseSMTLIB(const std::string& filename) {
     Token token = lexer.next_token();
 
     while (token.type != TokenType::EndFocal) {
+        //( countParen++
+        //) countParen--
+        //ha count paren 0 volt előzőleg
+            //assert -> assert tömba ami az assertek gyökerének indexét tárolja
+            //func-> funcname to int vmi mappal(gyökerek indexe)
+            //check-sat -> vége
+        //művelet esetén csak építem az AST-t 
+        //konstans esetén ha funcban van talán meg éri tárolni
         std::cout << "Token: '" << token.text << "'\n";
         token = lexer.next_token();
     }

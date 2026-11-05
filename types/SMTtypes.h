@@ -1,5 +1,6 @@
 #include <variant>
 #include <vector>
+#include <unordered_map>
 #include <optional>
 #include <cstdint>
 #include <iostream>
@@ -27,7 +28,9 @@ enum class RelationKind {
     BV_AND 
 };
 
-
+std::unordered_map<std::string, int> func;
+std::vector<int> asserts;
+std::vector<std::variant<BVLeaf, UnaryOp, BinaryOp>> AST;
 
 struct BVLeaf {
     //BitVector val;
@@ -51,7 +54,7 @@ struct BinaryOp {
     BinaryOp(int c1, int c2,RelationKind relation) : child1(c1), child2(c2),relation(relation) {}
 };
 
-std::vector<std::variant<BVLeaf, UnaryOp, BinaryOp>> AST;
+
 /*
 class BitVector {
     int length_in_bits;//bit-ben
