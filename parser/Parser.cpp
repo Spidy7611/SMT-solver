@@ -52,6 +52,7 @@ Formula parseCNF(const std::string& filename) {
 //SMT
 #include <iostream>
 #include <string_view>
+#include <string>
 #include "../types/SMTtypes.h"
 
 
@@ -131,7 +132,13 @@ Token read_it(TokenType t) {
 
 int parseSMTLIB(const std::string& filename) {
 
+
+    size_t countParen =0;
+    bool endOfBlock = true;
+
     std::ifstream file(filename);
+
+    
 
     if (!file.is_open()) {
         throw std::runtime_error("Nem sikerult megnyitni a fajlt");
@@ -147,9 +154,34 @@ int parseSMTLIB(const std::string& filename) {
     Token token = lexer.next_token();
 
     while (token.type != TokenType::EndFocal) {
+        switch (token.type)
+        {
         //( countParen++
+        case TokenType::LeftParen:
+            if(countParen==0)endOfBlock=true;
+            countParen++;
+            break;
         //) countParen--
-        //ha count paren 0 volt előzőleg
+        case TokenType::RightParen:
+            countParen--;
+            break;
+        //indentifier
+        case TokenType::Identifier:
+            //ha count paren 0 volt előzőleg
+            if(endOfBlock)makeTrees(token.text);
+            //ha nem 0
+            else buildTree(token.text);
+
+
+            
+        
+        default:
+            break;
+        }
+        
+        
+        
+
             //assert -> assert tömba ami az assertek gyökerének indexét tárolja
             //func-> funcname to int vmi mappal(gyökerek indexe)
             //check-sat -> vége
@@ -160,6 +192,23 @@ int parseSMTLIB(const std::string& filename) {
     }
 
     return 0;
+}
+void makeTrees(std::string_view tokenText){
+    if (tokenText == "assert") {
+
+    } 
+    else if (tokenText == "check-sat") {
+
+    } 
+    else if (tokenText == "declare-fun") {
+
+    } 
+    else {
+    // Egyéb azonosító
+    }
+}
+void buildTree(std::string_view tokenText){
+
 }
   // --- Tesztelés / Használat ---
 int main() {
