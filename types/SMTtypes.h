@@ -4,33 +4,13 @@
 #include <optional>
 #include <cstdint>
 #include <iostream>
+#include <stack>
 //#include "../memory/MemoryPool.h"
    
-
-
-//lexerhez
-enum class TokenType {
-    Unknown,
-    EndFocal,     // Fájl vége (EOF)
-    Identifier,   // pl. változónevek, kulcsszavak (pl. x, declare, assert) 
-    Value,       // start with #
-    op,    
-    LeftParen,    // (
-    RightParen    // )
-};
-struct Token {
-    TokenType type;
-    std::string_view text; // Mutató a pufferben lévő eredeti szövegrészletre (nincs másolás!)
-};
-
 enum class RelationKind {
     BV_ADD, 
     BV_AND 
 };
-
-std::unordered_map<std::string, int> func;
-std::vector<int> asserts;
-std::vector<std::variant<BVLeaf, UnaryOp, BinaryOp>> AST;
 
 struct BVLeaf {
     //BitVector val;
@@ -53,6 +33,20 @@ struct BinaryOp {
     int child2;
     BinaryOp(int c1, int c2,RelationKind relation) : child1(c1), child2(c2),relation(relation) {}
 };
+struct PlaceHolder
+{
+};
+
+
+
+
+std::unordered_map<std::string, int> func;
+std::vector<int> asserts;
+std::vector<std::variant<BVLeaf, UnaryOp, BinaryOp,PlaceHolder>> AST;
+std::stack<int,std::vector<int>> writePointer;//Az ast nem levéllel lezárt ágait tárolja
+
+
+
 
 
 /*

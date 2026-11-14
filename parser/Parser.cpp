@@ -54,80 +54,32 @@ Formula parseCNF(const std::string& filename) {
 #include <string_view>
 #include <string>
 #include "../types/SMTtypes.h"
+#include "../lexer.cpp"
 
+void makeTrees(std::string_view tokenText, Lexer& lexer){
+    //func-> funcname to int vmi mappal(gyökerek indexe)
+    if (tokenText == "declare-fun") {
+            std::cout << "making func: "<<std::string(lexer.next_token().text)<<AST.size()+1<<"\n";
+            func.insert({std::string(lexer.next_token().text) ,AST.size()+1});
+    } 
+    //assert -> assert tömba ami az assertek gyökerének indexét tárolja
+    else if (tokenText == "assert") {
+        std::cout << "making assert: "<<AST.size()+1<<"\n";
+        asserts.push_back(AST.size()+1);
+    } 
+    //check-sat -> vége
+    else if (tokenText == "check-sat") {
 
-class Lexer {
-    const char* ptr;
-    const char* end;
-
-
-public:
-    Lexer(const char* data, size_t size) : ptr(data), end(data + size) {}
-
-    Token next_token() {
-        skip_whitespace_and_comments();
-
-        // Ellenőrizzük, elértük-e a fájl végét
-        if (ptr >= end) {
-            return {TokenType::EndFocal, {}};
-        }
-
-        char c = *ptr;
-
-        // --- Egykarakteres tokenek (Operátorok, Zárójelek) ---
-        if (c == '(') { ptr++; return {TokenType::LeftParen, "("}; }
-        if (c == ')') { ptr++; return {TokenType::RightParen, ")"}; }
-
-        //több karakteres
-        if(c=='#')return read_it(TokenType::Value);
-        return read_it(TokenType::Identifier);
-
-
-
-
-        // Ha ismeretlen karakterbe ütközünk
-        ptr++;
-        return {TokenType::Unknown, std::string_view(ptr - 1, 1)};
+    } 
+    else {
+    std::cout<<"!!Tree type not supported: "<<tokenText << "'\n";
     }
-
-private:
-
-    // Whitespace-ek (szóköz, tab, új sor) és opcionális kommentek átugrása
-    void skip_whitespace_and_comments() {
-        while (ptr < end) {
-            char c = *ptr;
-            if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
-                ptr++;
-            } 
-            else if (c == ';') { // komment
-                while (ptr < end && *ptr != '\n') {
-                    ptr++;
-                }
-            } 
-            else {
-                
-                break;
-            }
-        }
-    }
-
-Token read_it(TokenType t) {
-    const char* start = ptr;
-
-    while (ptr < end) {
-        char c = *ptr;
-
-        if (c == ' ' || c == '\t' || c == '\n' ||
-            c == '\r' || c == '(' || c == ')') {
-            break;
-        }
-
-        ptr++;
-    }
-
-    return {t, std::string_view(start, ptr - start)};
 }
-};
+void buildTree(std::string_view tokenText){
+
+        //művelet esetén csak építem az AST-t 
+        //konstans esetén ha funcban van talán meg éri tárolni
+}
 
 
 int parseSMTLIB(const std::string& filename) {
@@ -152,7 +104,7 @@ int parseSMTLIB(const std::string& filename) {
     Lexer lexer(source_code.data(), source_code.size());
 
     Token token = lexer.next_token();
-
+//read row
     while (token.type != TokenType::EndFocal) {
         switch (token.type)
         {
@@ -165,51 +117,28 @@ int parseSMTLIB(const std::string& filename) {
         case TokenType::RightParen:
             countParen--;
             break;
-        //indentifier
+        //indentifier(row types)
         case TokenType::Identifier:
             //ha count paren 0 volt előzőleg
-            if(endOfBlock)makeTrees(token.text);
+            if(endOfBlock){
+                makeTrees(token.text,lexer);
+                endOfBlock=false;
+            }
             //ha nem 0
-            else buildTree(token.text);
-
-
-            
-        
-        default:
+            else buildTree(token.text); 
+            break;       
+        default: std::cout<<"!! Token type not supported: "<< token.text << toString(token.type) << "'\n";
             break;
         }
         
-        
-        
 
-            //assert -> assert tömba ami az assertek gyökerének indexét tárolja
-            //func-> funcname to int vmi mappal(gyökerek indexe)
-            //check-sat -> vége
-        //művelet esetén csak építem az AST-t 
-        //konstans esetén ha funcban van talán meg éri tárolni
         std::cout << "Token: '" << token.text << "'\n";
         token = lexer.next_token();
     }
 
     return 0;
 }
-void makeTrees(std::string_view tokenText){
-    if (tokenText == "assert") {
 
-    } 
-    else if (tokenText == "check-sat") {
-
-    } 
-    else if (tokenText == "declare-fun") {
-
-    } 
-    else {
-    // Egyéb azonosító
-    }
-}
-void buildTree(std::string_view tokenText){
-
-}
   // --- Tesztelés / Használat ---
 int main() {
     parseSMTLIB("or_monoton_n.txt");
