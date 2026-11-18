@@ -7,7 +7,8 @@ enum class TokenType {
     Identifier,   // pl. változónevek, kulcsszavak (pl. x, declare, assert) 
     Value,       // start with #    
     LeftParen,    // (
-    RightParen    // )
+    RightParen,    // )
+    c //_
 };
 
 struct Token {
@@ -48,6 +49,7 @@ public:
         // --- Egykarakteres tokenek (Operátorok, Zárójelek) ---
         if (c == '(') { ptr++; return {TokenType::LeftParen, "("}; }
         if (c == ')') { ptr++; return {TokenType::RightParen, ")"}; }
+        if (c == '_') { ptr++; return {TokenType::c, "_"}; }
 
         //több karakteres
         if(c=='#')return read_it(TokenType::Value);
