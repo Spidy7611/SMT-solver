@@ -7,10 +7,7 @@
 #include <stack>
 //#include "../memory/MemoryPool.h"
    
-enum class RelationKind {
-    BV_ADD, 
-    BV_AND 
-};
+
 
 struct BVLeaf {
     std::vector<bool> constats;
